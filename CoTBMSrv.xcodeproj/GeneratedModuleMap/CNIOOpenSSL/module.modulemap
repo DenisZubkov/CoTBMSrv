@@ -1,4 +1,4 @@
 module CNIOOpenSSL {
-    umbrella "/Users/denzu/Developer/CoTBMSrv/.build/checkouts/swift-nio-ssl/Sources/CNIOOpenSSL/include"
+    umbrella "/Users/DenZu/Developer/CoTBMSrv/.build/checkouts/swift-nio-ssl/Sources/CNIOOpenSSL/include"
     export *
 }

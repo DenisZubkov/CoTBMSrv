@@ -36,6 +36,7 @@ public func configure(
     migrationConfig.add(model: Staff.self, database: .mysql)
     migrationConfig.add(model: Dept.self, database: .mysql)
     migrationConfig.add(model: Sotrud.self, database: .mysql)
+    migrationConfig.add(model: LoadLog.self, database: .mysql)
     services.register(migrationConfig)
     
 }
