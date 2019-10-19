@@ -32,18 +32,6 @@ class GlobalSettings {
     var mainPriceType: String = "Розничная (руб)"
     var specialPriceType: String = "Спеццена"
     
-    
-    let sortArray: [SortList] = [
-        .alphbetUp ,
-        .alphbetDown ,
-        .priceUp,
-        .priceDown
-    ]
-    var currentSort: SortList = .alphbetUp {
-        didSet {
-            UserDefaults.standard.set(self.currentSort.image, forKey: "CurrentSort")
-        }
-    }
 
     
     var arrayURL: [URLComponents] = []

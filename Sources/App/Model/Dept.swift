@@ -24,7 +24,6 @@ struct Dept: Content {
     var shortName: String?
     var subDept: Int32
     var timeZone: String?
-    var parentDept: String?
 }
 
 extension Dept: MySQLUUIDModel {}

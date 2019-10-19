@@ -25,6 +25,7 @@ struct Sotrud: Content {
     var room: String?
     var terminationDate: Date?
     var workPhone: String?
+    var deptId: String?
 }
 
 extension Sotrud: MySQLUUIDModel {}

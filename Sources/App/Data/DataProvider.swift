@@ -32,9 +32,7 @@ class DataProvider {
         let table = "/employees/\(id)/photo"
         let urlString = globalSettings.getUrlComponents(table: table)
         guard let url = urlString.url else {
-            DispatchQueue.main.async {
-                completion(nil)
-            }
+            completion(nil)
             return
         }
         let request = URLRequest(url: url)
@@ -45,9 +43,7 @@ class DataProvider {
                 let response = response as? HTTPURLResponse,
                 response.statusCode == 200,
                 let _ = self else {
-                    DispatchQueue.main.async {
-                        completion(nil)
-                    }
+                    completion(nil)
                     return
             }
             guard let data = data else {
@@ -68,8 +64,8 @@ class DataProvider {
             if error != nil {
                 completion(error?.localizedDescription)
             }
-            guard let data = data else {
-                completion("Данные недоступны")
+            guard data != nil else {
+                completion("Failure")
                 return
             }
             guard let response = response as? HTTPURLResponse else { return }
@@ -78,7 +74,6 @@ class DataProvider {
                 completion(statusCodeString)
                 return
             }
-            UserDefaults.standard.set(data, forKey: url.absoluteString)
             completion("Ok")
         }
         dataTask.resume()
@@ -89,14 +84,10 @@ class DataProvider {
         let request = URLRequest(url: url)
         let dataTask = URLSession.shared.dataTask(with: request) { data, response, error in
             if error != nil {
-                DispatchQueue.main.async {
-                    completion(error?.localizedDescription.data(using: .utf8))
-                }
+                completion(error?.localizedDescription.data(using: .utf8))
             }
             guard let data = data else {
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
+                completion(nil)
                 return
             }
             guard let response = response as? HTTPURLResponse else { return }
@@ -105,10 +96,7 @@ class DataProvider {
                 completion(statusCodeString.data(using: .utf8))
                 return
             }
-            UserDefaults.standard.set(data, forKey: url.absoluteString)
-            DispatchQueue.main.async {
-                completion(data)
-            }
+            completion(data)
         }
         dataTask.resume()
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 struct SotrudJSON : Decodable {
-    var id: Int?
+    var id: Int64?
     var numberEmployee: Int?
     var surname: String?
     var name: String?
@@ -20,7 +20,7 @@ struct SotrudJSON : Decodable {
     var positionWork: String?
     var phone: String?
     var skype: String?
-    var positionId: Int?
+    var positionId: Int64?
     var workPhone: String?
     var mobilePhone: String?
     var room: String?

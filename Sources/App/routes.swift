@@ -17,6 +17,12 @@ public func routes(_ router: Router) throws {
         return "Check Started"
     }
     
+    router.get("Load") { req -> String in
+        let loadData = LoadDataProvider()
+        loadData.loadDeptDataFromWeb(req: req)
+        return "Load Started..."
+    }
+    
     router.get("Genders") { req -> Future<[Gender]> in
         return Gender.query(on: req).all()
     }
