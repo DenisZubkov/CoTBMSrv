@@ -276,6 +276,13 @@ class LoadDataProvider {
             for sotrud in sotrudJSON {
                 parceSotrud(deptKod: String(deptId), sotrudWeb: sotrud, req: req)
             }
+            print("Dept: \(dept.name ?? "Не указан")\nSotruds: \(self.sotruds.count)")
+        }
+        for staffType in self.staffTypes {
+            let _ = staffType.save(on: req)
+        }
+        for staff in self.staffs {
+            let _ = staff.save(on: req)
         }
         self.globalSettings.saveLoadLog(date: Date(), name: "Разбор данных из WEB завершен", description: nil, value: self.logOperation, time: Date().timeIntervalSince(self.dateBegin), req: req)
         self.logOperation += 1
@@ -324,7 +331,9 @@ class LoadDataProvider {
             let genderKod = parceGender(genderName: genderName, req: req)
             let staffName = sotrudWeb.positionWork ?? "Не указан"
             let staffId = sotrudWeb.positionId ?? 0
-            let staffKod = parceStaff(staffName: staffName, staffId: staffId, req: req)
+            let staffTypeName = sotrudWeb.typePositionName ?? "Не указан"
+            let staffTypeId = sotrudWeb.typePositionId ?? 0
+            let staffKod = parceStaff(staffName: staffName, staffId: staffId, staffTypeName: staffTypeName, staffTypeId: staffTypeId, req: req)
             if var sotrudDB = self.sotruds.filter({$0.kod == kod}).first {
                 sotrudDB.deptKod = deptKod
                 sotrudDB.addPhone = sotrudWeb.phone ?? "Не указан"
@@ -342,7 +351,6 @@ class LoadDataProvider {
                 sotrudDB.terminationDate = sotrudWeb.dateDismissal ?? ""
                 sotrudDB.genderKod = genderKod
                 sotrudDB.staffKod = staffKod
-                
                 let _ = sotrudDB.save(on: req)
             } else {
                 let sotrudDB = Sotrud.init(id: nil,
@@ -388,14 +396,38 @@ class LoadDataProvider {
         return kod
      }
     
-    func parceStaff(staffName: String, staffId: Int64, req: DatabaseConnectable) -> String {
+    func parceStaff(staffName: String, staffId: Int64, staffTypeName: String, staffTypeId: Int, req: DatabaseConnectable) -> String {
+        let kod = String(staffId)
+        let staffTypeKod = parceStaffType(staffTypeName: staffTypeName, staffTypeId: staffTypeId, req: req)
+        if self.staffs.filter({$0.kod == kod}).first != nil {
+            for i in 0..<self.staffs.count {
+                if self.staffs[i].kod == kod {
+                    self.staffs[i].name = staffName
+                    self.staffs[i].staffTypeKod = staffTypeKod
+                }
+            }
+        } else {
+            let staffDB = Staff.init(id: nil, kod: kod, name: staffName, staffTypeKod: staffTypeKod)
+            self.staffs.append(staffDB)
+        }
         
-        return String(staffId)
+        return kod
     }
     
-    func parceStaffType(staffName: String, staffId: Int64, req: DatabaseConnectable) -> String {
-        
-        return String(staffId)
+    func parceStaffType(staffTypeName: String, staffTypeId: Int, req: DatabaseConnectable) -> String {
+        let kod = String(staffTypeId)
+        if self.staffTypes.filter({$0.kod == kod}).first != nil {
+            for i in 0..<self.staffTypes.count {
+                if self.staffTypes[i].kod == kod {
+                    self.staffTypes[i].name = staffTypeName
+                    break
+                }
+            }
+        } else {
+            let staffTypeDB = StaffType.init(id: nil, kod: kod, name: staffTypeName)
+            self.staffTypes.append(staffTypeDB)
+        }
+        return kod
     }
     
     
