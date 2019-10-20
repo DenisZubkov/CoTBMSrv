@@ -160,7 +160,7 @@ class LoadDataProvider {
             var count = 0
             for currentDept in treeDept1 {
                 for currentSotrud in sotruds {
-                    if currentSotrud.deptId == currentDept.kod {
+                    if currentSotrud.deptKod == currentDept.kod {
                         count += 1
                     }
                 }
@@ -274,7 +274,7 @@ class LoadDataProvider {
             parceDept(deptWeb: dept, req: req)
             guard let deptId = dept.id, let sotrudJSON = sotrudData[deptId] else { continue }
             for sotrud in sotrudJSON {
-                parceSotrud(deptId: String(deptId), sotrudWeb: sotrud, req: req)
+                parceSotrud(deptKod: String(deptId), sotrudWeb: sotrud, req: req)
             }
         }
         self.globalSettings.saveLoadLog(date: Date(), name: "Разбор данных из WEB завершен", description: nil, value: self.logOperation, time: Date().timeIntervalSince(self.dateBegin), req: req)
@@ -287,17 +287,29 @@ class LoadDataProvider {
         if let deptId = deptWeb.id {
         let kod = String(deptId)
         if var deptDB = self.depts.filter({$0.kod == kod}).first {
-            deptDB.name = deptWeb.name
+            deptDB.name = deptWeb.name ?? "Не указан"
             deptDB.parentId = String(deptWeb.parentId ?? 0)
-            deptDB.address = deptWeb.adres
-            deptDB.phone = deptWeb.phone
+            deptDB.address = deptWeb.adres ?? "Не указан"
+            deptDB.phone = deptWeb.phone ?? "Не указан"
             deptDB.timeZone = String(deptWeb.timeZone ?? 0)
             deptDB.gpsX = deptWeb.gpsX ?? 0
             deptDB.gpsY = deptWeb.gpsY ?? 0
-            deptDB.email = deptWeb.email
+            deptDB.email = deptWeb.email ?? "Не указан"
             let _ = deptDB.save(on: req)
         } else {
-            let deptDB = Dept.init(id: nil, address: deptWeb.adres, countSotrud: 0, email: deptWeb.email, gpsX: deptWeb.gpsX ?? 0, gpsY: deptWeb.gpsY ?? 0, kod: kod, name: deptWeb.name, noShow: false, parentId: String(deptWeb.parentId ?? 0), phone: deptWeb.phone, shortName: nil, subDept: 0, timeZone: String(deptWeb.timeZone ?? 0))
+            let deptDB = Dept.init(id: nil,
+                                   address: deptWeb.adres ?? "Не указан",
+                                   countSotrud: 0,
+                                   email: deptWeb.email ?? "Не указан",
+                                   gpsX: deptWeb.gpsX ?? 0,
+                                   gpsY: deptWeb.gpsY ?? 0,
+                                   kod: kod,
+                                   name: deptWeb.name ?? "Не указан",
+                                   noShow: false,
+                                   parentId: String(deptWeb.parentId ?? 0),
+                                   phone: deptWeb.phone ?? "Не указан",
+                                   subDept: 0,
+                                   timeZone: String(deptWeb.timeZone ?? 0))
             let _ = deptDB.save(on: req)
             self.depts.append(deptDB)
             
@@ -305,9 +317,86 @@ class LoadDataProvider {
         }
     }
     
-    func parceSotrud(deptId: String, sotrudWeb: SotrudJSON, req: DatabaseConnectable) {
-        
+    func parceSotrud(deptKod: String, sotrudWeb: SotrudJSON, req: DatabaseConnectable) {
+        if let sotrudId = sotrudWeb.id {
+            let kod = String(sotrudId)
+            let genderName = sotrudWeb.gender ??  "Не указан"
+            let genderKod = parceGender(genderName: genderName, req: req)
+            let staffName = sotrudWeb.positionWork ?? "Не указан"
+            let staffId = sotrudWeb.positionId ?? 0
+            let staffKod = parceStaff(staffName: staffName, staffId: staffId, req: req)
+            if var sotrudDB = self.sotruds.filter({$0.kod == kod}).first {
+                sotrudDB.deptKod = deptKod
+                sotrudDB.addPhone = sotrudWeb.phone ?? "Не указан"
+                sotrudDB.email = sotrudWeb.email ?? "Не указан"
+                sotrudDB.firstName = sotrudWeb.name ?? ""
+                sotrudDB.lastName = sotrudWeb.surname ?? ""
+                sotrudDB.middleName = sotrudWeb.middleName ?? ""
+                sotrudDB.mobilePhone = sotrudWeb.mobilePhone ?? "Не указан"
+                sotrudDB.room = sotrudWeb.room ?? "Не указан"
+                sotrudDB.workPhone = sotrudWeb.workPhone ?? "Не указан"
+                sotrudDB.leadership = String(sotrudWeb.leadership ?? 0)
+                sotrudDB.photo = kod
+                sotrudDB.birthday = sotrudWeb.birthday ?? ""
+                sotrudDB.employmentDate = sotrudWeb.dateRecruitment ?? ""
+                sotrudDB.terminationDate = sotrudWeb.dateDismissal ?? ""
+                sotrudDB.genderKod = genderKod
+                sotrudDB.staffKod = staffKod
+                
+                let _ = sotrudDB.save(on: req)
+            } else {
+                let sotrudDB = Sotrud.init(id: nil,
+                                           addPhone: sotrudWeb.phone ?? "Не указан",
+                                           birthday: sotrudWeb.birthday ?? "",
+                                           email: sotrudWeb.email ?? "Не указан",
+                                           employmentDate: sotrudWeb.dateRecruitment ?? "",
+                                           firstName: sotrudWeb.name ?? "Не указан",
+                                           kod: kod,
+                                           lastName: sotrudWeb.surname ?? "Не указан",
+                                           leadership: String(sotrudWeb.leadership ?? 0),
+                                           middleName: sotrudWeb.middleName ?? "",
+                                           mobilePhone: sotrudWeb.mobilePhone ?? "Не указан",
+                                           photo: kod,
+                                           room: sotrudWeb.room ?? "Не указан",
+                                           terminationDate: sotrudWeb.dateDismissal ?? "",
+                                           workPhone: sotrudWeb.workPhone ?? "Не указан",
+                                           deptKod: deptKod,
+                                           genderKod: genderKod,
+                                           staffKod: staffKod)
+                let _ = sotrudDB.save(on: req)
+                self.sotruds.append(sotrudDB)
+            }
+        }
         
     }
+    
+    func parceGender(genderName: String, req: DatabaseConnectable) -> String {
+        var kod = "0"
+        if genderName == "мужской" {
+            kod = "1"
+        } else if genderName == "женский" {
+            kod = "2"
+        } else {
+            kod = "0"
+        }
+        guard let _ = self.genders.filter({$0.kod == kod}).first  else {
+            let genderDB = Gender.init(id: nil, kod: kod, name: genderName)
+            let _ = genderDB.save(on: req)
+            self.genders.append(genderDB)
+            return kod
+        }
+        return kod
+     }
+    
+    func parceStaff(staffName: String, staffId: Int64, req: DatabaseConnectable) -> String {
+        
+        return String(staffId)
+    }
+    
+    func parceStaffType(staffName: String, staffId: Int64, req: DatabaseConnectable) -> String {
+        
+        return String(staffId)
+    }
+    
     
 }

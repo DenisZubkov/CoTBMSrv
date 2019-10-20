@@ -11,19 +11,18 @@ import Vapor
 
 struct Dept: Content {
     var id: UUID?
-    var address: String?
+    var address: String
     var countSotrud: Int32
-    var email: String?
+    var email: String
     var gpsX: Double
     var gpsY: Double
-    var kod: String?
-    var name: String?
+    var kod: String
+    var name: String
     var noShow: Bool
-    var parentId: String?
-    var phone: String?
-    var shortName: String?
+    var parentId: String
+    var phone: String
     var subDept: Int32
-    var timeZone: String?
+    var timeZone: String
 }
 
 extension Dept: MySQLUUIDModel {}

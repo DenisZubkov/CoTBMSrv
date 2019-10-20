@@ -11,7 +11,6 @@ import Vapor
 
 struct Gender: Content {
     var id: UUID?
-    var dataVersion: String
     var kod: String
     var name: String
 }

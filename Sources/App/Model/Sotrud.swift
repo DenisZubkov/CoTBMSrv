@@ -11,21 +11,23 @@ import Vapor
 
 struct Sotrud: Content {
     var id: UUID?
-    var addPhone: String?
-    var birthday: Date?
-    var email: String?
-    var employmentDate: Date?
-    var firstName: String?
-    var kod: String?
-    var lastName: String?
-    var leadership: String?
-    var middleName: String?
-    var mobilePhone: String?
-    var photo: String?
-    var room: String?
-    var terminationDate: Date?
-    var workPhone: String?
-    var deptId: String?
+    var addPhone: String
+    var birthday: String
+    var email: String
+    var employmentDate: String
+    var firstName: String
+    var kod: String
+    var lastName: String
+    var leadership: String
+    var middleName: String
+    var mobilePhone: String
+    var photo: String
+    var room: String
+    var terminationDate: String
+    var workPhone: String
+    var deptKod: String
+    var genderKod: String
+    var staffKod: String
 }
 
 extension Sotrud: MySQLUUIDModel {}
