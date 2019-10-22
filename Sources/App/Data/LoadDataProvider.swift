@@ -10,6 +10,7 @@ import Routing
 import Vapor
 
 
+
 class LoadDataProvider {
     
     let globalSettings = GlobalSettings()
@@ -69,6 +70,15 @@ class LoadDataProvider {
     func loadDeptDataFromWeb(req: DatabaseConnectable) {
         self.globalSettings.saveLoadLog(date: Date(), name: "Загрузка данных из WEB", description: nil, value: self.logOperation, time: Date().timeIntervalSince(self.dateBegin), req: req)
         self.logOperation += 1
+        
+        if let data = dataProvider.loadDataFromFile(fileName: "flag", fileExt: "txt") {
+            let isLoad = String(decoding: data, as: UTF8.self)
+            if isLoad == "1" { return }
+        }
+        if let dataString = "1".data(using: .utf8) {
+            let _ = dataProvider.saveDataToFile(fileName: "flag", fileExt: "txt", data: dataString)
+        }
+
         let urlComponent = globalSettings.getUrlComponents(table: "/departments")
         guard let url = urlComponent.url else { return }
         self.sotrudData = [:]
@@ -135,7 +145,6 @@ class LoadDataProvider {
                 self.logOperation += 1
                 self.globalSettings.printDate(dateBegin: self.dateBegin, dateEnd: Date())
                 self.updateDataFromDB(req: req)
-                self.fillSubDept(req: req)
             }
         }
     }
@@ -262,6 +271,10 @@ class LoadDataProvider {
                         let _ = Sotrud.query(on: req).all().map { results in
                             self.sotruds = results
                             print("Sotruds: \(self.sotruds.count)")
+                            var i = 0
+                            self.loadPhoto(sotruds: self.sotruds, i: &i, req: req)
+                            self.fillSubDept(req: req)
+                            print("SubDeptFilled.")
                         }
                     }
                 }
@@ -288,6 +301,9 @@ class LoadDataProvider {
         self.logOperation += 1
         self.globalSettings.printDate(dateBegin: self.dateBegin, dateEnd: Date())
         checkDBLoad(req: req)
+        if let dataString = "0".data(using: .utf8) {
+            let _ = dataProvider.saveDataToFile(fileName: "flag", fileExt: "txt", data: dataString)
+        }
     }
     
     func parceDept(deptWeb: DeptJSON, req: DatabaseConnectable) {
@@ -430,5 +446,25 @@ class LoadDataProvider {
         return kod
     }
     
-    
+    func loadPhoto(sotruds: [Sotrud], i: inout Int, req: DatabaseConnectable) {
+        let photoId = sotruds[i].photo
+        var index = i
+        dataProvider.downloadPhoto(id: photoId) { data in
+            if let data = data {
+                let isLoaded = self.dataProvider.saveDataToFile(fileName: photoId, fileExt: "jpg", data: data)
+                self.globalSettings.saveLoadLog(date: Date(), name: "Фото \(photoId) загружено:", description: "\(isLoaded)", value: self.logOperation, time: Date().timeIntervalSince(self.dateBegin), req: req)
+                self.logOperation += 1
+            }
+            index += 1
+            if index < sotruds.count {
+                self.loadPhoto(sotruds: sotruds, i: &index, req: req)
+            } else {
+                self.globalSettings.saveLoadLog(date: Date(), name: "Загрузка фото завершена", description: "Ok", value: self.logOperation, time: Date().timeIntervalSince(self.dateBegin), req: req)
+                self.logOperation += 1
+            }
+            
+        }
+        
+        
+    }
 }

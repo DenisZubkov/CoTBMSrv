@@ -27,6 +27,19 @@ class DataProvider {
         }
     }
     
+    func loadDataFromFile(fileName: String, fileExt: String) -> Data? {
+        let nsDocumentDirectory = FileManager.SearchPathDirectory.documentDirectory
+        let nsUserDomainMask    = FileManager.SearchPathDomainMask.userDomainMask
+        let paths               = NSSearchPathForDirectoriesInDomains(nsDocumentDirectory, nsUserDomainMask, true)
+        if let dirPath          = paths.first
+        {
+            let dataURL = URL(fileURLWithPath: dirPath).appendingPathComponent("\(fileName).\(fileExt)")
+            let data  = try? Data(contentsOf: dataURL)
+            return data
+        }
+        return nil
+    }
+    
     
     func downloadPhoto(id: String, completion: @escaping (Data?) -> Void) {
         let table = "/employees/\(id)/photo"

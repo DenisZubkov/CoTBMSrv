@@ -23,6 +23,26 @@ public func routes(_ router: Router) throws {
         return "Load Started..."
     }
     
+    router.get("LoadPhotos") { req -> String in
+        let loadData = LoadDataProvider()
+        var i = 0
+        let _ = Sotrud.query(on: req).all().map { results in
+            let sotruds = results
+            loadData.loadPhoto(sotruds: sotruds, i: &i, req: req)
+        }
+        return "Load Photos Started..."
+    }
+    
+    router.get("ZipPhotos") { req -> String in
+        let loadData = LoadDataProvider()
+        var i = 0
+        let _ = Sotrud.query(on: req).all().map { results in
+            let sotruds = results
+            loadData.loadPhoto(sotruds: sotruds, i: &i, req: req)
+        }
+        return "Zip Photos Started..."
+    }
+    
     router.get("Genders") { req -> Future<[Gender]> in
         return Gender.query(on: req).all()
     }
