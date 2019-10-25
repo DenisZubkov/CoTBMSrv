@@ -309,30 +309,38 @@ class LoadDataProvider {
     func parceDept(deptWeb: DeptJSON, req: DatabaseConnectable) {
         if let deptId = deptWeb.id {
         let kod = String(deptId)
+        let name = deptWeb.name ?? "Не указан"
+        let parentId = String(deptWeb.parentId ?? 0)
+        let address = deptWeb.adres ?? "Не указан"
+        let phone = deptWeb.phone ?? "Не указан"
+        let timeZone = String(deptWeb.timeZone ?? 0)
+        let gpsX = deptWeb.gpsX ?? 0
+        let gpsY = deptWeb.gpsY ?? 0
+        let email = deptWeb.email ?? "Не указан"
         if var deptDB = self.depts.filter({$0.kod == kod}).first {
-            deptDB.name = deptWeb.name ?? "Не указан"
-            deptDB.parentId = String(deptWeb.parentId ?? 0)
-            deptDB.address = deptWeb.adres ?? "Не указан"
-            deptDB.phone = deptWeb.phone ?? "Не указан"
-            deptDB.timeZone = String(deptWeb.timeZone ?? 0)
-            deptDB.gpsX = deptWeb.gpsX ?? 0
-            deptDB.gpsY = deptWeb.gpsY ?? 0
-            deptDB.email = deptWeb.email ?? "Не указан"
+            deptDB.name = name
+            deptDB.parentId = parentId
+            deptDB.address = address
+            deptDB.phone = phone
+            deptDB.timeZone = timeZone
+            deptDB.gpsX = gpsX
+            deptDB.gpsY = gpsY
+            deptDB.email = email
             let _ = deptDB.save(on: req)
         } else {
             let deptDB = Dept.init(id: nil,
-                                   address: deptWeb.adres ?? "Не указан",
+                                   address: address,
                                    countSotrud: 0,
-                                   email: deptWeb.email ?? "Не указан",
-                                   gpsX: deptWeb.gpsX ?? 0,
-                                   gpsY: deptWeb.gpsY ?? 0,
+                                   email: email,
+                                   gpsX: gpsX,
+                                   gpsY: gpsY,
                                    kod: kod,
-                                   name: deptWeb.name ?? "Не указан",
+                                   name: name,
                                    noShow: false,
-                                   parentId: String(deptWeb.parentId ?? 0),
-                                   phone: deptWeb.phone ?? "Не указан",
+                                   parentId: parentId,
+                                   phone: phone,
                                    subDept: 0,
-                                   timeZone: String(deptWeb.timeZone ?? 0))
+                                   timeZone: timeZone)
             let _ = deptDB.save(on: req)
             self.depts.append(deptDB)
             
@@ -350,40 +358,53 @@ class LoadDataProvider {
             let staffTypeName = sotrudWeb.typePositionName ?? "Не указан"
             let staffTypeId = sotrudWeb.typePositionId ?? 0
             let staffKod = parceStaff(staffName: staffName, staffId: staffId, staffTypeName: staffTypeName, staffTypeId: staffTypeId, req: req)
+            let deptKod = deptKod
+            let addPhone = sotrudWeb.phone ?? "Не указан"
+            let email = sotrudWeb.email ?? "Не указан"
+            let firstName = sotrudWeb.name ?? ""
+            let lastName = sotrudWeb.surname ?? ""
+            let middleName = sotrudWeb.middleName ?? ""
+            let mobilePhone = sotrudWeb.mobilePhone ?? "Не указан"
+            let room = sotrudWeb.room ?? "Не указан"
+            let workPhone = sotrudWeb.workPhone ?? "Не указан"
+            let leadership = String(sotrudWeb.leadership ?? 0)
+            let birthday = sotrudWeb.birthday ?? ""
+            let employmentDate = sotrudWeb.dateRecruitment ?? ""
+            let terminationDate = sotrudWeb.dateDismissal ?? ""
             if var sotrudDB = self.sotruds.filter({$0.kod == kod}).first {
                 sotrudDB.deptKod = deptKod
-                sotrudDB.addPhone = sotrudWeb.phone ?? "Не указан"
-                sotrudDB.email = sotrudWeb.email ?? "Не указан"
-                sotrudDB.firstName = sotrudWeb.name ?? ""
-                sotrudDB.lastName = sotrudWeb.surname ?? ""
-                sotrudDB.middleName = sotrudWeb.middleName ?? ""
-                sotrudDB.mobilePhone = sotrudWeb.mobilePhone ?? "Не указан"
-                sotrudDB.room = sotrudWeb.room ?? "Не указан"
-                sotrudDB.workPhone = sotrudWeb.workPhone ?? "Не указан"
-                sotrudDB.leadership = String(sotrudWeb.leadership ?? 0)
+                sotrudDB.addPhone = addPhone
+                sotrudDB.email = email
+                sotrudDB.firstName = firstName
+                sotrudDB.lastName = lastName
+                sotrudDB.middleName = middleName
+                sotrudDB.mobilePhone = mobilePhone
+                sotrudDB.room = room
+                sotrudDB.workPhone = workPhone
+                sotrudDB.leadership = leadership
                 sotrudDB.photo = kod
-                sotrudDB.birthday = sotrudWeb.birthday ?? ""
-                sotrudDB.employmentDate = sotrudWeb.dateRecruitment ?? ""
-                sotrudDB.terminationDate = sotrudWeb.dateDismissal ?? ""
+                sotrudDB.birthday = birthday
+                sotrudDB.employmentDate = employmentDate
+                sotrudDB.terminationDate = terminationDate
                 sotrudDB.genderKod = genderKod
                 sotrudDB.staffKod = staffKod
                 let _ = sotrudDB.save(on: req)
             } else {
                 let sotrudDB = Sotrud.init(id: nil,
-                                           addPhone: sotrudWeb.phone ?? "Не указан",
-                                           birthday: sotrudWeb.birthday ?? "",
-                                           email: sotrudWeb.email ?? "Не указан",
-                                           employmentDate: sotrudWeb.dateRecruitment ?? "",
-                                           firstName: sotrudWeb.name ?? "Не указан",
+                                           addPhone: addPhone ,
+                                           birthday: birthday,
+                                           email: email,
+                                           employmentDate: employmentDate,
+                                           firstName: firstName,
                                            kod: kod,
-                                           lastName: sotrudWeb.surname ?? "Не указан",
-                                           leadership: String(sotrudWeb.leadership ?? 0),
-                                           middleName: sotrudWeb.middleName ?? "",
-                                           mobilePhone: sotrudWeb.mobilePhone ?? "Не указан",
+                                           lastName: lastName,
+                                           leadership: leadership,
+                                           middleName: middleName,
+                                           mobilePhone: mobilePhone,
                                            photo: kod,
-                                           room: sotrudWeb.room ?? "Не указан",
-                                           terminationDate: sotrudWeb.dateDismissal ?? "",
-                                           workPhone: sotrudWeb.workPhone ?? "Не указан",
+                                           room: room,
+                                           terminationDate: terminationDate,
+                                           workPhone:workPhone,
                                            deptKod: deptKod,
                                            genderKod: genderKod,
                                            staffKod: staffKod)

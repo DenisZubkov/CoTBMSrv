@@ -10,6 +10,7 @@ import Routing
 import Vapor
 
 
+
 class DataProvider {
 
     var dateLastModified: String?
