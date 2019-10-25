@@ -9,7 +9,7 @@ import Fluent
 import FluentMySQL
 import Vapor
 
-struct Sotrud: Content {
+struct Sotrud1: Content {
     var id: UUID?
     var addPhone: String
     var birthday: String
@@ -31,6 +31,6 @@ struct Sotrud: Content {
     var staffKod: String
 }
 
-extension Sotrud: MySQLUUIDModel {}
-extension Sotrud: Migration {
+extension Sotrud1: MySQLUUIDModel {}
+extension Sotrud1: Migration {
 }

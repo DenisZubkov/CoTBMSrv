@@ -8,7 +8,8 @@
 import Foundation
 import Routing
 import Vapor
-
+import Fluent
+import FluentMySQL
 
 
 class DataProvider {
