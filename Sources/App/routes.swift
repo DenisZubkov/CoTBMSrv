@@ -59,9 +59,12 @@ public func routes(_ router: Router) throws {
         return Dept.query(on: req).all()
     }
     
-    router.get("Sotruds") { req -> Future<[Sotrud]> in
-        return Sotrud.query(on: req).all()
+    router.get("Sotrud", String.parameter) { req -> Future<[Sotrud]> in
+        let kod = try req.parameters.next(String.self)
+        let query = Sotrud.query(on: req).filter(\Sotrud.kod, ._equal, kod).all()
+        return query
     }
+    
     
     
 }

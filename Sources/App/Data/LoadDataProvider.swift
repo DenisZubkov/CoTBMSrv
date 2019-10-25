@@ -446,12 +446,25 @@ class LoadDataProvider {
         return kod
     }
     
+//    let photoJSON = PhotoJSON.init(kod: photoId, data: data)
+//    let encoder = JSONEncoder()
+//    do {
+//        let dataJSON = try encoder.encode(photoJSON)
+//        sotrudDB.data = dataJSON
+//        let _ = sotrudDB.save(on: req)
+//    } catch {
+//        print(error)
+//    }
+    
     func loadPhoto(sotruds: [Sotrud], i: inout Int, req: DatabaseConnectable) {
         let photoId = sotruds[i].photo
+        var sotrudDB = sotruds[i]
         var index = i
         dataProvider.downloadPhoto(id: photoId) { data in
             if let data = data {
                 let isLoaded = self.dataProvider.saveDataToFile(fileName: photoId, fileExt: "jpg", data: data)
+                sotrudDB.data = data
+                let _ = sotrudDB.save(on: req)
                 self.globalSettings.saveLoadLog(date: Date(), name: "Фото \(photoId) загружено:", description: "\(isLoaded)", value: self.logOperation, time: Date().timeIntervalSince(self.dateBegin), req: req)
                 self.logOperation += 1
             }

@@ -22,6 +22,7 @@ struct Sotrud: Content {
     var middleName: String
     var mobilePhone: String
     var photo: String
+    var data: Data?
     var room: String
     var terminationDate: String
     var workPhone: String
